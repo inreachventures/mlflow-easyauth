@@ -1,15 +1,16 @@
-FROM debian:buster-slim
+FROM continuumio/miniconda3:latest
 
 COPY ./requirements.txt ./requirements.txt
 
-# pandas installed from Debian repos to avoid building C extensions
 RUN set -x \
     && apt-get update \
+    && apt-get upgrade --no-install-recommends --no-install-suggests -y \
     && apt-get install --no-install-recommends --no-install-suggests -y \
-    python3 python3-pip python3-setuptools python3-pandas supervisor gettext-base nginx apache2-utils python3-psycopg2 \
-    && pip3 install wheel \
-    && pip3 install -r requirements.txt \
-    && apt-get remove --purge --auto-remove -y ca-certificates && rm -rf /var/lib/apt/lists/*
+    supervisor gettext-base nginx apache2-utils curl
+
+RUN pip install mlflow boto3 wheel psycopg2-binary
+
+RUN apt-get remove --purge --auto-remove -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 
 # WWW (nginx)
@@ -25,6 +26,6 @@ COPY ./entry-point.sh /app/entry-point.sh
 COPY ./webserver.sh /app/webserver.sh
 COPY ./mlflow.sh /app/mlflow.sh
 
-CMD ["/bin/bash", "/app/entry-point.sh"]
-
 EXPOSE 6000
+
+CMD ["/bin/bash", "/app/entry-point.sh"]
