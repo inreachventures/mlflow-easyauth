@@ -27,5 +27,6 @@ COPY ./webserver.sh /app/webserver.sh
 COPY ./mlflow.sh /app/mlflow.sh
 
 EXPOSE 6000
+EXPOSE 5000
 
 CMD ["/bin/bash", "/app/entry-point.sh"]
